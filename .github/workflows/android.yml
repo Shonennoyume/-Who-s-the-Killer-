@@ -1,11 +1,10 @@
 
-name: WHO'S THE KILLER? - Android Build
+name: WHO'S THE KILLER? - Build 0.4.0
 
 on:
   workflow_dispatch:
   push:
-    branches:
-      - main
+    branches: [main]
 
 permissions:
   contents: read
@@ -24,12 +23,27 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Install SDK packages
+      - name: Find Android SDK
+        shell: bash
         run: |
-          sdkmanager --install \
+          SDK="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}}"
+          echo "ANDROID_HOME=$SDK" >> "$GITHUB_ENV"
+          echo "$SDK/platform-tools" >> "$GITHUB_PATH"
+
+          MANAGER=$(find "$SDK/cmdline-tools" -name sdkmanager -type f 2>/dev/null | head -n 1)
+
+          if [ -z "$MANAGER" ]; then
+            echo "sdkmanager was not found."
+            exit 1
+          fi
+
+          echo "SDK_MANAGER=$MANAGER" >> "$GITHUB_ENV"
+          echo "$(dirname "$MANAGER")" >> "$GITHUB_PATH"
+
+      - name: Install Android packages
+        run: |
+          yes | "$SDK_MANAGER" --licenses || true
+          "$SDK_MANAGER" --install \
             "platform-tools" \
             "platforms;android-35" \
             "build-tools;35.0.0"
@@ -39,15 +53,22 @@ jobs:
         with:
           gradle-version: '8.9'
 
-      - name: Build APK
+      - name: Check source files
+        run: |
+          test -f app/build.gradle.kts
+          test -f app/src/main/AndroidManifest.xml
+          test -f app/src/main/java/com/whosthekiller/game/MainActivity.java
+
+      - name: Build game
         run: gradle --no-daemon assembleDebug
 
       - name: Check APK
         run: |
-          test -s app/build/outputs/apk/debug/app-debug.apk
-          ls -lh app/build/outputs/apk/debug/app-debug.apk
+          APK="app/build/outputs/apk/debug/app-debug.apk"
+          test -s "$APK"
+          ls -lh "$APK"
 
-      - name: Upload APK
+      - name: Upload game APK
         uses: actions/upload-artifact@v4
         with:
           name: WhosTheKiller-v0.4.0
