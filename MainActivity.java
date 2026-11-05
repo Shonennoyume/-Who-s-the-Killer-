@@ -17,14 +17,15 @@ public class MainActivity extends Activity {
 
         screen.setText(
             "WHO'S THE KILLER?\n\n" +
-            "CIB - UNDERCOVER INVESTIGATION\n\n" +
-            "DEVELOPMENT BUILD 0.2.0"
+            "CRIME INVESTIGATION BUREAU\n\n" +
+            "UNDERCOVER DIVISION\n\n" +
+            "BUILD 0.3.0"
         );
 
-        screen.setTextSize(23);
+        screen.setTextSize(24);
         screen.setTextColor(Color.WHITE);
         screen.setGravity(Gravity.CENTER);
-        screen.setBackgroundColor(Color.rgb(15, 18, 25));
+        screen.setBackgroundColor(Color.rgb(15, 18, 28));
 
         setContentView(screen);
     }
