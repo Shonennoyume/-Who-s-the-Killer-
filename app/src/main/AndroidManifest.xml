@@ -4,7 +4,7 @@
     <application
         android:allowBackup="false"
         android:label="Who's the Killer?"
-        android:icon="@drawable/ic_launcher"
+        android:icon="@android:drawable/ic_menu_search"
         android:theme="@android:style/Theme.Material.Light.NoActionBar">
 
         <activity
@@ -18,7 +18,5 @@
             </intent-filter>
 
         </activity>
-
     </application>
-
 </manifest>
